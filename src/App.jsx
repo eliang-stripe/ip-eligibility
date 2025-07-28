@@ -72,69 +72,38 @@ function App() {
     setCurrentView('home')
   }
 
+  let currentPrototype;
+  switch (currentView) {
+    case 'prototype1':
+      currentPrototype = <Prototype1 />
+      break;
+    case 'prototype2':
+      currentPrototype = <Prototype2 />
+  }
+
   if (currentView === 'home') {
     return <HomePage onSelectPrototype={handleSelectPrototype} />
   }
 
-  if (currentView === 'prototype1') {
+  else {
     return (
       <div>
         {/* Back to Home Button */}
         <div className="fixed top-3 left-4 z-50">
           <button
             onClick={handleBackToHome}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium text-gray-700"
+            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium text-gray-700 cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 4L2 8L6 12M2 8H14"/>
             </svg>
-            <span>Back to Prototypes</span>
+            <span>All prototypes</span>
           </button>
         </div>
-        <Prototype1 />
+        {currentPrototype}
       </div>
     )
   }
-
-  if (currentView === 'prototype2') {
-    return (
-      <div>
-        {/* Back to Home Button */}
-        <div className="fixed top-3 left-4 z-50">
-          <button
-            onClick={handleBackToHome}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium text-gray-700"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 4L2 8L6 12M2 8H14"/>
-            </svg>
-            <span>Back to Prototypes</span>
-          </button>
-        </div>
-        <Prototype2 />
-      </div>
-    )
-  }
-
-  // Fallback for other prototypes (not yet implemented)
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Prototype Coming Soon
-        </h2>
-        <p className="text-gray-600 mb-6">
-          This prototype is still in development.
-        </p>
-        <button
-          onClick={handleBackToHome}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-        >
-          Back to Prototypes
-        </button>
-      </div>
-    </div>
-  )
 }
 
 export default App

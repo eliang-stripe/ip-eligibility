@@ -61,10 +61,10 @@ const ChevronRightIcon = () => (
 const Sidebar = () => (
   <div className="fixed left-0 top-0 w-[228px] bg-white border-r border-gray-200 flex flex-col h-screen z-10">
     {/* Account Section */}
-    <div className="h-[60px] px-5 flex items-center border-b border-gray-200">
+    <div className="h-[60px] px-5 flex items-center border-gray-200">
       <div className="flex items-center space-x-2">
         <div className="w-6 h-6 bg-orange-400 rounded overflow-hidden flex items-center justify-center">
-          <span className="text-white text-xs font-semibold">🌵</span>
+          <span className="text-white text-xs font-semibold"        >🌵</span>
         </div>
         <span className="font-semibold text-gray-800 text-sm">Cactus Practice</span>
       </div>
@@ -115,17 +115,12 @@ const SectionHeading = ({ label }) => (
 )
 
 const Header = () => (
-  <div className="h-[60px] bg-white border-b border-gray-200 px-6 flex items-center justify-between sticky top-0 z-10">
+  <div className="h-[60px] bg-white border-gray-200 px-6 flex items-center justify-between fixed top-0 z-10 w-[calc(100%-228px)]">
     {/* Search */}
-    <div className="flex-1 max-w-[318px]">
-      <div className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg">
+    <div className="flex-1 max-w-[500px]">
+      <div className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg transition-all hover:bg-gray-100 cursor-pointer">
         <SearchIcon />
         <span className="text-sm text-gray-500">Search</span>
-        <div className="ml-auto">
-          <div className="w-5 h-5 bg-gray-300 rounded flex items-center justify-center">
-            <span className="text-xs font-bold text-gray-600">/</span>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -465,11 +460,11 @@ function Prototype2() {
     <div className="min-h-screen bg-white">
       <Sidebar />
 
-      <div className="ml-[228px] flex flex-col min-w-0 relative pb-20">
+      <div className="ml-[228px] flex flex-col min-w-0 relative pb-20 pt-16">
         <Header />
 
         {/* FOOTER */}
-        <div class="fixed ml-[228px] bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-5">
+        <div class="fixed ml-[228px] bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-5 z-10">
             <button className="py-2 px-3 bg-indigo-600 text-white text-sm rounded-lg font-medium text-gray-500">Review and apply changes</button>
         </div>
 
@@ -526,8 +521,8 @@ function Prototype2() {
                   value="criteria"
                   selectedValue={audienceType}
                   onChange={setAudienceType}
-                  label="Define eligibility criteria"
-                  description="Accounts that match the criteria and thresholds you set will be eligible for Instant Payouts."
+                  label="Specify eligibility criteria"
+                  description="Only accounts that match all of the criteria you set will be eligible for Instant Payouts."
                 />
 
                 {/* Criteria Options - only show when criteria is selected */}
@@ -568,7 +563,7 @@ function Prototype2() {
                   <div className="ml-7 text-sm text-gray-700 p-4 bg-gray-100 rounded-md">
                     <button
                       onClick={() => setShowAccountsModal(true)}
-                      className="cursor-pointer font-medium underline"
+                      className="cursor-pointer font-[600]"
                     >
                       {eligibleAccountsCount} accounts
                     </button> are eligible based on these rules. You can manually set eligibility for any account from their account details page.
@@ -585,7 +580,7 @@ function Prototype2() {
 
                 {audienceType === 'selected' && (
                   <div className="ml-7 text-sm text-gray-700">
-                    You can manually set eligibility for any account from their account details page.
+                    You can manually set eligibility for any account from their account details page. <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">Learn more</span>
                   </div>
                 )}
               </div>
@@ -633,7 +628,7 @@ function Prototype2() {
                     <span>$10,000.00 limit</span>
                   </div>
                 </div>
-                <button className="px-3 py-1.5 bg-gray-100 text-sm font-medium rounded-md hover:bg-gray-200">
+                <button className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer">
                   Request daily limit increase
                 </button>
               </div>
@@ -647,7 +642,7 @@ function Prototype2() {
               </div>
               <div className="flex-1">
                 <p className="text-sm text-gray-700">
-                  Customize a monetization strategy for Instant Payouts in <span className="text-indigo-600">Platform pricing</span>.
+                  Customize a monetization strategy for Instant Payouts in <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">Platform pricing</span>.
                 </p>
               </div>
             </div>
