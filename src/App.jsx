@@ -46,7 +46,7 @@ const HomePage = ({ onSelectPrototype }) => (
         <PrototypeCard
           title="Prototype 1 (separate)"
           description="Separate toggle controls for audience and eligibility."
-          status="active"
+          status="outdated"
           onClick={() => onSelectPrototype('prototype1')}
         />
 
@@ -62,7 +62,7 @@ const HomePage = ({ onSelectPrototype }) => (
 )
 
 function App() {
-  const [currentView, setCurrentView] = useState('home')
+  const [currentView, setCurrentView] = useState('prototype2')
 
   const handleSelectPrototype = (prototypeId) => {
     setCurrentView(prototypeId)
@@ -72,6 +72,10 @@ function App() {
     setCurrentView('home')
   }
 
+  if (currentView === 'home') {
+    return <HomePage onSelectPrototype={handleSelectPrototype} />
+  }
+
   let currentPrototype;
   switch (currentView) {
     case 'prototype1':
@@ -79,13 +83,29 @@ function App() {
       break;
     case 'prototype2':
       currentPrototype = <Prototype2 />
+      break;
+    default:
+      currentPrototype = (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Prototype Coming Soon
+            </h2>
+            <p className="text-gray-600 mb-6">
+              This prototype is still in development.
+            </p>
+            <button
+              onClick={handleBackToHome}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Back to Prototypes
+            </button>
+          </div>
+        </div>
+      )
   }
 
-  if (currentView === 'home') {
-    return <HomePage onSelectPrototype={handleSelectPrototype} />
-  }
-
-  else {
+  if (currentPrototype) {
     return (
       <div>
         {/* Back to Home Button */}
@@ -100,10 +120,12 @@ function App() {
             <span>All prototypes</span>
           </button>
         </div>
-        {currentPrototype}
-      </div>
-    )
-  }
-}
+                 {currentPrototype}
+       </div>
+     )
+   }
+
+   return null
+ }
 
 export default App

@@ -45,11 +45,12 @@ const SearchIcon = () => (
 )
 
 const InfoIcon = () => (
-  <svg className="w-4 h-4" fill="none" viewBox="0 0 16 16">
-    <path clipRule="evenodd" d="M8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15ZM8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16Z" fill="currentColor" fillRule="evenodd"/>
-    <path d="M7.25 4.25C7.25 3.83579 7.58579 3.5 8 3.5C8.41421 3.5 8.75 3.83579 8.75 4.25C8.75 4.66421 8.41421 5 8 5C7.58579 5 7.25 4.66421 7.25 4.25Z" fill="currentColor"/>
-    <path d="M8 7.25C8.41421 7.25 8.75 7.58579 8.75 8V11.25C8.75 11.6642 8.41421 12 8 12C7.58579 12 7.25 11.6642 7.25 11.25V8C7.25 7.58579 7.58579 7.25 8 7.25Z" fill="currentColor"/>
-  </svg>
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11 2.5H5C3.61929 2.5 2.5 3.61929 2.5 5V11C2.5 12.3807 3.61929 13.5 5 13.5H11C12.3807 13.5 13.5 12.3807 13.5 11V5C13.5 3.61929 12.3807 2.5 11 2.5ZM5 1C2.79086 1 1 2.79086 1 5V11C1 13.2091 2.79086 15 5 15H11C13.2091 15 15 13.2091 15 11V5C15 2.79086 13.2091 1 11 1H5Z" fill="#6C7688"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M6.25 8C6.25 7.58579 6.58579 7.25 7 7.25H8.25C8.66421 7.25 9 7.58579 9 8V11.5C9 11.9142 8.66421 12.25 8.25 12.25C7.83579 12.25 7.5 11.9142 7.5 11.5V8.75H7C6.58579 8.75 6.25 8.41421 6.25 8Z" fill="#6C7688"/>
+<path d="M6.75 5C6.75 4.31075 7.31075 3.75 8 3.75C8.68925 3.75 9.25 4.31075 9.25 5C9.25 5.68925 8.68925 6.25 8 6.25C7.31075 6.25 6.75 5.68925 6.75 5Z" fill="#6C7688"/>
+</svg>
+
 )
 
 const ChevronRightIcon = () => (
@@ -186,7 +187,7 @@ const RadioGroup = ({ value, onChange, options }) => (
 const Checkbox = ({ checked, onChange, label, showInput, inputValue, onInputChange, inputPlaceholder, prefix, suffix }) => (
   <div className="space-y-3">
     <button onClick={onChange} className="flex items-start space-x-2 text-left w-full">
-      <div className="flex-shrink-0 mt-1">
+      <div className="flex-shrink-0 mt-0.5">
         <div className={`w-3.5 h-3.5 rounded border ${checked ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300 bg-white'} flex items-center justify-center`}>
           {checked && (
             <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 8 8">
@@ -210,7 +211,7 @@ const Checkbox = ({ checked, onChange, label, showInput, inputValue, onInputChan
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder={inputPlaceholder}
-            className={`w-32 ${prefix ? 'pl-6' : 'pl-2'} pr-2 py-1 border border-gray-300 rounded-md text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
+            className={`w-32 ${prefix ? 'pl-6' : 'pl-2'} pr-2 py-1 border border-gray-300 rounded-md text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-right`}
           />
         </div>
         {suffix && (
@@ -455,7 +456,7 @@ function Prototype1() {
     <div className="min-h-screen bg-white">
       <Sidebar />
 
-      <div className="ml-[228px] flex flex-col min-w-0">
+      <div className="ml-[228px] flex flex-col min-w-0 pb-20 pt-16">
         <Header />
 
         {/* FOOTER */}
@@ -505,6 +506,8 @@ function Prototype1() {
               description="[Once enabled, Instant Payouts eligibility will be determined by these dashboard settings]"
             />
 
+            { noCodeControls && (
+            <>
             {/* Audience Selection */}
             <div className="flex space-x-10">
               <div className="w-[300px] space-y-1">
@@ -536,7 +539,7 @@ function Prototype1() {
               </div>
               <div className="w-[500px] space-y-6">
                 {audienceType === 'eligible' && (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <Checkbox
                       checked={accountAge}
                       onChange={() => setAccountAge(!accountAge)}
@@ -574,20 +577,20 @@ function Prototype1() {
                         <>
                           <button
                             onClick={() => setShowAccountsModal(true)}
-                            className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                            className="cursor-pointer font-[600]"
                           >
                             {eligibleAccountsCount} accounts
-                          </button> are currently selected. Use the "Configure eligibility" button to manually select accounts.
+                          </button> are currently selected.
                         </>
                       )
                       : (
                         <>
-                          Based on these rules, <button
+                        {eligibleAccountsCount == 200 && "All "}
+                        <button
                             onClick={() => setShowAccountsModal(true)}
-                            className="cursor-pointer font-medium underline"
-                          >
+                            className="cursor-pointer font-[600]">
                             {eligibleAccountsCount} accounts
-                          </button> are eligible. You can manually override eligibility as needed.
+                        </button> are eligible based on these rules. You can manually set eligibility for any account from their account details page.
                         </>
                       )
                     }
@@ -659,6 +662,8 @@ function Prototype1() {
                 </p>
               </div>
             </div>
+            </>
+            )}
           </div>
         </div>
 
