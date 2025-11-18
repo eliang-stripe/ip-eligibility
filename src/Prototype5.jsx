@@ -26,7 +26,9 @@ import {
   CAFlag,
   FRFlag,
   AlertIcon12,
+  CheckCircleIcon,
 } from "./icons";
+import { Accordion, CodeBlock, Button } from "./components";
 
 const Tooltip = ({ children, text }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -216,36 +218,6 @@ const ControlPanelToggle = ({ checked, onChange, label }) => (
       />
     </button>
   </div>
-);
-
-// New Radio Button Component for audience selection
-const RadioOption = ({
-  value,
-  selectedValue,
-  onChange,
-  label,
-  description,
-}) => (
-  <button
-    onClick={() => onChange(value)}
-    className="flex items-start space-x-2.5 w-full text-left cursor-pointer"
-  >
-    <div className="flex-shrink-0 mt-0.5">
-      <div
-        className={`w-4 h-4 rounded-full border-1 border-gray-300 flex items-center justify-center ${
-          selectedValue === value ? "bg-indigo-600 border-none" : "bg-white"
-        }`}
-      >
-        {selectedValue === value && (
-          <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
-        )}
-      </div>
-    </div>
-    <div className="flex-1">
-      <div className="font-medium text-sm text-gray-800">{label}</div>
-      <div className="text-xs text-gray-500 mt-0.5">{description}</div>
-    </div>
-  </button>
 );
 
 const Checkbox = ({
@@ -606,12 +578,132 @@ const EligibilityInfoModal = ({ isOpen, onClose }) => {
   );
 };
 
-function Prototype2() {
-  const [noCodeControls, setNoCodeControls] = useState(true);
-  const [audienceType, setAudienceType] = useState("criteria"); // 'criteria' or 'selected'
+// API Integration Info Modal Component
+const ApiIntegrationModal = ({ isOpen, onClose }) => {
+  const [expandedSections, setExpandedSections] = useState({
+    api: false,
+    embedded: false,
+    express: false,
+  });
+
+  const toggleSection = (section) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Set up Instant Payouts
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 text-xl font-semibold"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="px-6 py-5 overflow-y-auto max-h-[60vh]">
+          <div className="space-y-5 text-sm text-gray-700">
+            <div className="">
+              <Accordion
+                title="Express dashboard"
+                isExpanded={expandedSections.express}
+                onToggle={() => toggleSection("express")}
+              >
+                <p>
+                  Express dashboard automatically applies any changes you make
+                  to eligibility criteria and daily limits. No additional setup
+                  is required.
+                </p>
+              </Accordion>
+
+              <Accordion
+                title="Embedded components"
+                isExpanded={expandedSections.embedded}
+                onToggle={() => toggleSection("embedded")}
+              >
+                <p>
+                  [This content is AI-generated] If you're using Connect
+                  embedded components, you can configure Instant Payouts
+                  settings directly within your embedded UI. This allows your
+                  connected accounts to manage their own payout preferences
+                  while respecting the eligibility rules you've defined.
+                  <CodeBlock variant="block" className="mt-4">
+                    {`instant_payouts?: "dashboard_eligibility" | "custom_eligibility" | "disabled",`}
+                  </CodeBlock>
+                </p>
+              </Accordion>
+              <Accordion
+                title="API integration"
+                isExpanded={expandedSections.api}
+                onToggle={() => toggleSection("api")}
+              >
+                <p>
+                  [This content is AI-generated] Use the{" "}
+                  <CodeBlock variant="inline">
+                    instant_payout_eligibility
+                  </CodeBlock>{" "}
+                  endpoint to safely check an account's eligibility status based
+                  on the criteria you've set.
+                  <CodeBlock variant="block" className="mt-4">
+                    {`GET /v1/accounts/{id}/instant_payout_eligibility`}
+                  </CodeBlock>
+                </p>
+              </Accordion>
+            </div>
+            <p>
+              Need additional help? View the integration guide on{" "}
+              <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">
+                Stripe Docs
+              </span>
+              .
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 pb-4">
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={onClose}
+              className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer"
+            >
+              Close
+            </button>
+            <button
+              variant="default"
+              className="px-3 py-1.5 bg-indigo-600 text-white  text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer"
+            >
+              View integration guide
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function Prototype5() {
+  const audienceType = "criteria"; // Always use criteria-based eligibility
   const [accountAge, setAccountAge] = useState(true);
-  const [payoutVolume, setPayoutVolume] = useState(false);
-  const [payoutNumber, setPayoutNumber] = useState(false);
+  const [payoutVolume, setPayoutVolume] = useState(true);
+  const [payoutNumber, setPayoutNumber] = useState(true);
   const [dailyLimit, setDailyLimit] = useState("500.00");
 
   // Control panel state
@@ -622,7 +714,7 @@ function Prototype2() {
 
   // Country filtering state
   const [selectedCountries, setSelectedCountries] = useState({
-    us: true,
+    us: false,
     uk: false,
     ca: false,
     es: false,
@@ -642,6 +734,9 @@ function Prototype2() {
   const [showAccountsModal, setShowAccountsModal] = useState(false);
   const [showEligibilityInfoModal, setShowEligibilityInfoModal] =
     useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [showPricingSavedMessage, setShowPricingSavedMessage] = useState(false);
+  const [showApiIntegrationModal, setShowApiIntegrationModal] = useState(false);
 
   // Helper function to parse number values from strings (handles commas)
   const parseNumber = (value) => {
@@ -800,6 +895,20 @@ function Prototype2() {
     selectedCountries,
   ]);
 
+  // Update country selection when multicurrency changes
+  useEffect(() => {
+    if (!multicurrency) {
+      // When multicurrency is disabled, only show US
+      setSelectedCountries({
+        us: true,
+        uk: false,
+        ca: false,
+        es: false,
+        fr: false,
+      });
+    }
+  }, [multicurrency]);
+
   return (
     <div className="min-h-screen bg-white flex flex-row">
       <Sidebar />
@@ -858,333 +967,269 @@ function Prototype2() {
                 </p>
               </div>
 
-              {/* No-code Controls Toggle */}
-              <Toggle
-                enabled={noCodeControls}
-                onChange={() => setNoCodeControls(!noCodeControls)}
-                label="No-code Instant Payout controls"
-                description="When enabled, Instant Payouts eligibility will be determined by these dashboard settings"
-              />
+              <div className="flex flex-col gap-2">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Instant Payouts eligibility
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Use the controls to determine which accounts are eligible for
+                  Instant Payouts.{" "}
+                  <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">
+                    View integration guide
+                  </span>
+                </p>
+              </div>
+              {/* Available Countries Section */}
+              <div className="flex space-x-15">
+                <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
+                  <h3 className="font-semibold text-sm text-gray-800">
+                    Availability
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Choose where Instant Payouts is available.
+                  </p>
+                </div>
+                <div className="max-w-[650px] flex-1">
+                  <div className="grid grid-cols-3 gap-x-2 gap-y-2">
+                    <CountryCheckbox
+                      checked={selectedCountries.us}
+                      onChange={(checked) => {
+                        setSelectedCountries({
+                          ...selectedCountries,
+                          us: checked,
+                        });
+                      }}
+                      label="United States"
+                      countryCode="us"
+                    />
+                    {multicurrency && (
+                      <>
+                        <CountryCheckbox
+                          checked={selectedCountries.ca}
+                          onChange={(checked) => {
+                            setSelectedCountries({
+                              ...selectedCountries,
+                              ca: checked,
+                            });
+                          }}
+                          label="Canada"
+                          countryCode="ca"
+                        />
+                        <CountryCheckbox
+                          checked={selectedCountries.uk}
+                          onChange={(checked) => {
+                            setSelectedCountries({
+                              ...selectedCountries,
+                              uk: checked,
+                            });
+                          }}
+                          label="United Kingdom"
+                          countryCode="uk"
+                        />
+                        <CountryCheckbox
+                          checked={selectedCountries.es}
+                          onChange={(checked) => {
+                            setSelectedCountries({
+                              ...selectedCountries,
+                              es: checked,
+                            });
+                          }}
+                          label="Spain"
+                          countryCode="es"
+                        />
+                        <CountryCheckbox
+                          checked={selectedCountries.fr}
+                          onChange={(checked) => {
+                            setSelectedCountries({
+                              ...selectedCountries,
+                              fr: checked,
+                            });
+                          }}
+                          label="France"
+                          countryCode="fr"
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-              {noCodeControls && (
-                <>
-                  {/* Instant Payouts Audience - Radio Button Design */}
-                  <div className="flex space-x-15">
-                    <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
-                      <h3 className="font-semibold text-sm text-gray-800">
-                        Instant Payouts eligibility
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Select which accounts are eligible for Instant Payouts.
-                      </p>
-                      <p className="text-sm text-gray-500 mt-4">
-                        For more information on risk, please consult Instant
-                        Payouts{" "}
-                        <a className="text-indigo-600 cursor-pointer hover:text-indigo-800">
-                          documentation
-                        </a>{" "}
-                        and{" "}
-                        <a className="text-indigo-600 cursor-pointer hover:text-indigo-800">
-                          best practices
-                        </a>
-                        for managing fraud and risk.
-                      </p>
-                    </div>
-                    <div className="max-w-[650px] space-y-4">
-                      {/* <RadioOption
-                        value="recommended"
-                        selectedValue={audienceType}
-                        onChange={setAudienceType}
-                        label="Stripe recommended"
-                        description="Stripe determines which accounts are eligible."
-                      /> */}
-                      {/* Stripe recommended disclosure - only show when Stripe recommended is selected */}
-                      {audienceType === "recommended" && (
-                        <div className="ml-6.5 text-sm text-gray-700 p-4 bg-gray-50 rounded-md flex flex-col gap-2">
-                          <p>
-                            <span className="font-[600]">123 accounts</span> are
-                            eligible based on Stripe's model. You can manually
-                            override eligibility for any account from their
-                            account details page.
-                          </p>
-                          <button
-                            onClick={() => setShowEligibilityInfoModal(true)}
-                            className="text-indigo-700 cursor-pointer hover:text-indigo-800 text-left"
+              {/* Eligibility Filters Section */}
+              {Object.values(selectedCountries).some(Boolean) ? (
+                <div className="flex space-x-15">
+                  <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
+                    <h3 className="font-semibold text-sm text-gray-800">
+                      Eligibility filters
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Only accounts that match all of the filters you set will
+                      be eligible for Instant Payouts.
+                    </p>
+                    <p className="text-sm text-gray-500 mt-4">
+                      Stripe recommends setting at least one filter to manage
+                      risk.{" "}
+                      <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">
+                        Learn more
+                      </span>{" "}
+                    </p>
+                  </div>
+                  <div className="max-w-[650px] flex-1 space-y-3">
+                    <Checkbox
+                      checked={accountAge}
+                      onChange={() => setAccountAge(!accountAge)}
+                      label="Account age"
+                      showInput={true}
+                      inputValue={accountAgeThreshold}
+                      onInputChange={handleAccountAgeChange}
+                      suffix="days or older"
+                    />
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => setPayoutVolume(!payoutVolume)}
+                        className="flex items-start space-x-2 text-left w-full cursor-pointer"
+                      >
+                        <div className="flex-shrink-0 mt-0.5">
+                          <div
+                            className={`w-3.5 h-3.5 rounded border ${
+                              payoutVolume
+                                ? "bg-indigo-600 border-indigo-600"
+                                : "border-gray-300 bg-white"
+                            } flex items-center justify-center`}
                           >
-                            How does Stripe determine eligibility?
-                          </button>
-                        </div>
-                      )}
-
-                      <RadioOption
-                        value="criteria"
-                        selectedValue={audienceType}
-                        onChange={setAudienceType}
-                        label="Set my own criteria"
-                        description="Accounts that match all of the criteria you set will be eligible."
-                      />
-
-                      {/* Criteria Options - only show when criteria is selected */}
-                      {audienceType === "criteria" && (
-                        <div className="ml-7 space-y-3">
-                          <Checkbox
-                            checked={accountAge}
-                            onChange={() => setAccountAge(!accountAge)}
-                            label="Account age"
-                            showInput={true}
-                            inputValue={accountAgeThreshold}
-                            onInputChange={handleAccountAgeChange}
-                            suffix="days or older"
-                          />
-                          <div className="space-y-3">
-                            <button
-                              onClick={() => setPayoutVolume(!payoutVolume)}
-                              className="flex items-start space-x-2 text-left w-full cursor-pointer"
-                            >
-                              <div className="flex-shrink-0 mt-0.5">
-                                <div
-                                  className={`w-3.5 h-3.5 rounded border ${
-                                    payoutVolume
-                                      ? "bg-indigo-600 border-indigo-600"
-                                      : "border-gray-300 bg-white"
-                                  } flex items-center justify-center`}
-                                >
-                                  {payoutVolume && (
-                                    <svg
-                                      className="w-2 h-2 text-white"
-                                      fill="none"
-                                      viewBox="0 0 8 8"
-                                    >
-                                      <path
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="1.5"
-                                        d="M1.5 4L3 5.5L6.5 2"
-                                      />
-                                    </svg>
-                                  )}
-                                </div>
-                              </div>
-                              <span className="font-medium text-sm text-gray-800">
-                                Total payout volume
-                              </span>
-                            </button>
-
                             {payoutVolume && (
-                              <div className="ml-5 flex items-center space-x-2">
-                                <div className="relative">
-                                  <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                    $
-                                  </span>
-                                  <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    value={payoutVolumeThreshold}
-                                    onChange={(e) =>
-                                      handlePayoutVolumeChange(e.target.value)
-                                    }
-                                    placeholder="10,000.00"
-                                    className="w-32 pl-6 pr-2 py-1 border border-gray-300 rounded-md text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-right"
-                                  />
-                                </div>
-                                <span className="text-sm text-gray-500">
-                                  {multicurrency ? "USD" : ""} or greater
-                                </span>
-                                {multicurrency && (
-                                  <Tooltip text="This amount will be converted to the local currency of the connected account.">
-                                    <div className="p-2 -ml-3">
-                                      <InfoIcon12 />
-                                    </div>
-                                  </Tooltip>
-                                )}
-                              </div>
+                              <svg
+                                className="w-2 h-2 text-white"
+                                fill="none"
+                                viewBox="0 0 8 8"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="1.5"
+                                  d="M1.5 4L3 5.5L6.5 2"
+                                />
+                              </svg>
                             )}
                           </div>
-                          <Checkbox
-                            checked={payoutNumber}
-                            onChange={() => setPayoutNumber(!payoutNumber)}
-                            label="Number of lifetime payouts"
-                            showInput={true}
-                            inputValue={payoutNumberThreshold}
-                            onInputChange={handlePayoutNumberChange}
-                            suffix="or more payouts"
-                          />
-
-                          {multicurrency &&
-                            (() => {
-                              const selectedCountryCount =
-                                Object.values(selectedCountries).filter(
-                                  Boolean
-                                ).length;
-                              const isOnlyOneSelected =
-                                selectedCountryCount === 1;
-
-                              return (
-                                <div className="space-y-2 mt-5">
-                                  <div className="font-medium text-sm text-gray-800">
-                                    Country
-                                  </div>
-                                  <div className="grid grid-cols-3 gap-x-2 gap-y-2">
-                                    <CountryCheckbox
-                                      checked={selectedCountries.us}
-                                      onChange={(checked) => {
-                                        setSelectedCountries({
-                                          ...selectedCountries,
-                                          us: checked,
-                                        });
-                                      }}
-                                      label="United States"
-                                      countryCode="us"
-                                      disabled={
-                                        isOnlyOneSelected &&
-                                        selectedCountries.us
-                                      }
-                                    />
-                                    <CountryCheckbox
-                                      checked={selectedCountries.ca}
-                                      onChange={(checked) => {
-                                        setSelectedCountries({
-                                          ...selectedCountries,
-                                          ca: checked,
-                                        });
-                                      }}
-                                      label="Canada"
-                                      countryCode="ca"
-                                      disabled={
-                                        isOnlyOneSelected &&
-                                        selectedCountries.ca
-                                      }
-                                    />
-                                    <CountryCheckbox
-                                      checked={selectedCountries.uk}
-                                      onChange={(checked) => {
-                                        setSelectedCountries({
-                                          ...selectedCountries,
-                                          uk: checked,
-                                        });
-                                      }}
-                                      label="United Kingdom"
-                                      countryCode="uk"
-                                      disabled={
-                                        isOnlyOneSelected &&
-                                        selectedCountries.uk
-                                      }
-                                    />
-                                    <CountryCheckbox
-                                      checked={selectedCountries.es}
-                                      onChange={(checked) => {
-                                        setSelectedCountries({
-                                          ...selectedCountries,
-                                          es: checked,
-                                        });
-                                      }}
-                                      label="Spain"
-                                      countryCode="es"
-                                      disabled={
-                                        isOnlyOneSelected &&
-                                        selectedCountries.es
-                                      }
-                                    />
-                                    <CountryCheckbox
-                                      checked={selectedCountries.fr}
-                                      onChange={(checked) => {
-                                        setSelectedCountries({
-                                          ...selectedCountries,
-                                          fr: checked,
-                                        });
-                                      }}
-                                      label="France"
-                                      countryCode="fr"
-                                      disabled={
-                                        isOnlyOneSelected &&
-                                        selectedCountries.fr
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                              );
-                            })()}
                         </div>
-                      )}
+                        <span className="font-medium text-sm text-gray-800">
+                          Total payout volume
+                        </span>
+                      </button>
 
-                      {audienceType === "criteria" && (
-                        <div className="ml-7 text-sm text-gray-700 p-4 bg-gray-50 rounded-md">
-                          {eligibleAccountsCount == 200 && "All "}
-                          <button
-                            onClick={() => setShowAccountsModal(true)}
-                            className="cursor-pointer font-[600]"
-                          >
-                            {eligibleAccountsCount} accounts
-                          </button>{" "}
-                          are eligible based on these rules. You can manually
-                          set eligibility for any account from their account
-                          details page.
-                        </div>
-                      )}
-
-                      <RadioOption
-                        value="selected"
-                        selectedValue={audienceType}
-                        onChange={setAudienceType}
-                        label="Choose specific accounts"
-                        description="Only accounts you choose will be eligible."
-                      />
-
-                      {audienceType === "selected" && (
-                        <div className="ml-7 text-sm text-gray-700">
-                          You can manually set eligibility for any account from
-                          their account details page.{" "}
-                          <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">
-                            Learn more
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Daily Limit */}
-                  <div className="flex space-x-15">
-                    <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
-                      <h3 className="font-semibold text-sm text-gray-800">
-                        Daily limit per account
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Connected accounts can use Instant Payouts to pay out up
-                        to this amount each day.
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-[146px]">
-                        <div className="relative">
-                          <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                            $
-                          </span>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={dailyLimit}
-                            onChange={(e) =>
-                              handleDailyLimitChange(e.target.value)
-                            }
-                            className="w-full pl-6 pr-2 py-1 border border-gray-300 rounded-md text-sm text-gray-800"
-                          />
-                        </div>
-                      </div>
-                      <span className="text-sm text-gray-500">
-                        {multicurrency ? "USD" : ""} per account
-                      </span>
-                      {multicurrency && (
-                        <Tooltip text="This amount will be converted to the local currency of the connected account.">
-                          <div class="p-2 -ml-3">
-                            <InfoIcon12 />
+                      {payoutVolume && (
+                        <div className="ml-5 flex items-center space-x-2">
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                              $
+                            </span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={payoutVolumeThreshold}
+                              onChange={(e) =>
+                                handlePayoutVolumeChange(e.target.value)
+                              }
+                              placeholder="10,000.00"
+                              className="w-32 pl-6 pr-2 py-1 border border-gray-300 rounded-md text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-right"
+                            />
                           </div>
-                        </Tooltip>
+                          <span className="text-sm text-gray-500">
+                            {multicurrency ? "USD" : ""} or greater
+                          </span>
+                          {multicurrency && (
+                            <Tooltip text="This amount will be converted to the local currency of the connected account.">
+                              <div className="p-2 -ml-3">
+                                <InfoIcon12 />
+                              </div>
+                            </Tooltip>
+                          )}
+                        </div>
                       )}
                     </div>
+                    <Checkbox
+                      checked={payoutNumber}
+                      onChange={() => setPayoutNumber(!payoutNumber)}
+                      label="Number of lifetime payouts"
+                      showInput={true}
+                      inputValue={payoutNumberThreshold}
+                      onInputChange={handlePayoutNumberChange}
+                      suffix="or more payouts"
+                    />
+
+                    <div className="text-sm text-gray-700 p-4 bg-gray-50 rounded-md">
+                      {eligibleAccountsCount == 200 && "All "}
+                      <button
+                        onClick={() => setShowAccountsModal(true)}
+                        className="cursor-pointer font-[600]"
+                      >
+                        {eligibleAccountsCount} accounts
+                      </button>{" "}
+                      are eligible based on these rules. You can manually set
+                      eligibility for any account from their account details
+                      page.
+                    </div>
                   </div>
-                </>
+                </div>
+              ) : (
+                <div className="flex space-x-15">
+                  <div className="basis-1/3 shrink-0 max-w-[300px]"></div>
+                  <div className="max-w-[650px] flex-1">
+                    <div className="text-sm text-gray-700 p-4 bg-gray-50 rounded-md">
+                      {eligibleAccountsCount == 200 && "All "}
+                      <button
+                        onClick={() => setShowAccountsModal(true)}
+                        className="cursor-pointer font-[600]"
+                      >
+                        {eligibleAccountsCount} accounts
+                      </button>{" "}
+                      are eligible based on these rules. You can manually set
+                      eligibility for any account from their account details
+                      page.
+                    </div>
+                  </div>
+                </div>
               )}
+
+              {/* Daily Limit */}
+              <div className="flex space-x-15">
+                <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
+                  <h3 className="font-semibold text-sm text-gray-800">
+                    Daily limit per account
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    The maximum amount that each connected account can instantly
+                    pay out each day.
+                  </p>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-[146px]">
+                    <div className="relative">
+                      <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                        $
+                      </span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={dailyLimit}
+                        onChange={(e) => handleDailyLimitChange(e.target.value)}
+                        className="w-full pl-6 pr-2 py-1 border border-gray-300 rounded-md text-sm text-gray-800"
+                      />
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {multicurrency ? "USD" : ""} per account
+                  </span>
+                  {multicurrency && (
+                    <Tooltip text="This amount will be converted to the local currency of the connected account.">
+                      <div class="p-2 -ml-3">
+                        <InfoIcon12 />
+                      </div>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
 
               {/* Divider */}
               <hr className="border-gray-200" />
@@ -1216,26 +1261,37 @@ function Prototype2() {
                   {!isPricingSetUp ? (
                     <>
                       {/* Not set up - Show "Set up pricing scheme" button */}
-                      <button className="px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-all cursor-pointer">
+                      <button
+                        onClick={() => setShowPricingModal(true)}
+                        className="px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-all cursor-pointer"
+                      >
                         Set up pricing scheme
                       </button>
                       {/* Warning message */}
-                      {noCodeControls && (
-                        <div className="flex items-center space-x-2 text-[#B13600]">
-                          <AlertIcon12 />
-                          <span className="text-sm">
-                            You must set up pricing before enabling Instant
-                            Payouts.
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex items-center space-x-2 text-[#B13600]">
+                        <AlertIcon12 />
+                        <span className="text-sm">
+                          You must set up pricing before enabling Instant
+                          Payouts.
+                        </span>
+                      </div>
                     </>
                   ) : (
                     <>
                       {/* Set up - Show "Edit pricing scheme" button */}
-                      <button className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer">
+                      <button
+                        onClick={() => setShowPricingModal(true)}
+                        className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer"
+                      >
                         Edit pricing scheme
                       </button>
+                      {/* Success message */}
+                      {showPricingSavedMessage && (
+                        <div className="flex items-center space-x-2 text-green-700">
+                          <CheckCircleIcon />
+                          <span className="text-sm">Pricing scheme saved</span>
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -1248,8 +1304,8 @@ function Prototype2() {
                     Platform daily limit
                   </h3>
                   <p className="text-sm text-gray-500">
-                    The total amount of Instant Payouts across all connected
-                    accounts.
+                    The maximum amount that all of your connected accounts can
+                    instantly pay out each day.
                   </p>
                 </div>
                 <div className="flex-1 space-y-5">
@@ -1265,11 +1321,12 @@ function Prototype2() {
                       <span>$10,000.00 limit</span>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer">
-                    Request daily limit increase
-                  </button>
                   <p className="text-sm text-gray-500">
-                    Daily limits are reset at midnight UTC.
+                    Daily limits are reset at midnight UTC.{" "}
+                    <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">
+                      Contact us
+                    </span>{" "}
+                    to request a daily limit increase.
                   </p>
                 </div>
               </div>
@@ -1293,6 +1350,66 @@ function Prototype2() {
         isOpen={showEligibilityInfoModal}
         onClose={() => setShowEligibilityInfoModal(false)}
       />
+
+      {/* API Integration Modal */}
+      <ApiIntegrationModal
+        isOpen={showApiIntegrationModal}
+        onClose={() => setShowApiIntegrationModal(false)}
+      />
+
+      {/* Pricing Modal */}
+      {showPricingModal && (
+        <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-10">
+          <div className="bg-white w-full h-full flex flex-col rounded-lg shadow-lg">
+            {/* Modal Header */}
+            <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Instant Payouts pricing scheme
+              </h2>
+              <button
+                onClick={() => setShowPricingModal(false)}
+                className="text-gray-500 hover:text-gray-800 transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-auto p-6">
+              {/* Empty for now */}
+              <div class="bg-black/5 rounded-xl p-6 w-full h-full flex items-center justify-center">
+                Pricing scheme will go here
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-end">
+              <button
+                onClick={() => {
+                  setIsPricingSetUp(true);
+                  setShowPricingModal(false);
+                  setShowPricingSavedMessage(true);
+                }}
+                className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-all cursor-pointer"
+              >
+                Save pricing scheme
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Control Panel */}
       <div
@@ -1362,4 +1479,4 @@ function Prototype2() {
   );
 }
 
-export default Prototype2;
+export default Prototype5;

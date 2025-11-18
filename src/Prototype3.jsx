@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import connectedAccountsData from "../data/connected_accounts.json";
 import cactusImg from "./assets/cactus.png";
+import { Button } from "./components";
 import {
   HomeIcon,
   BalanceIcon,
@@ -28,19 +29,23 @@ import {
   AlertIcon12,
 } from "./icons";
 
-const Tooltip = ({ children, text }) => {
+// Common components used by both flows
+const Tooltip = ({ children, text, disabled }) => {
   const [isVisible, setIsVisible] = useState(false);
+
+  // Don't show tooltip if text is empty or disabled is true
+  const shouldShowTooltip = text && text.trim() !== "" && !disabled;
 
   return (
     <div className="relative inline-block">
       <div
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
+        onMouseEnter={() => shouldShowTooltip && setIsVisible(true)}
+        onMouseLeave={() => shouldShowTooltip && setIsVisible(false)}
         className="cursor-pointer"
       >
         {children}
       </div>
-      {
+      {shouldShowTooltip && (
         <div
           className={`${
             isVisible ? "opacity-100" : "opacity-0"
@@ -48,7 +53,7 @@ const Tooltip = ({ children, text }) => {
         >
           <p>{text}</p>
         </div>
-      }
+      )}
     </div>
   );
 };
@@ -137,40 +142,212 @@ const Header = () => (
   </div>
 );
 
-const Footer = ({ isPricingSetUp }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
+// Onboarding Flow Components
+const OnboardingHeader = ({ title, description, onEnableClick }) => (
+  <div className="bg-gray-50 rounded-lg p-12 mb-8">
+    <div className="max-w-[431px]">
+      <div className="flex items-center space-x-4 mb-6"></div>
+      <h1 className="text-[32px] font-bold text-gray-900 leading-[40px] mb-3">
+        {title}
+      </h1>
+      <p className="text-lg text-gray-600 leading-[28px] mb-6">{description}</p>
+      <div className="flex items-center space-x-3">
+        <Button variant="primary" size="lg" onClick={onEnableClick}>
+          Enable no-code controls
+        </Button>
+        <Button variant="secondary" size="lg">
+          View docs
+        </Button>
+      </div>
+    </div>
+  </div>
+);
+
+// Enable Modal Component
+const EnableModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-0 right-0 bg-white border-t border-gray-200 py-3 z-10 w-[calc(100%-228px)]">
-      <div className="max-w-[1280px] mx-auto px-6">
-        <div className="relative inline-block">
-          <button
-            className={`py-2 px-3 text-sm rounded-lg font-medium bg-indigo-600 text-white ${
-              isPricingSetUp
-                ? "hover:bg-indigo-700 cursor-pointer"
-                : "opacity-50"
-            }`}
-            onMouseEnter={() => !isPricingSetUp && setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-          >
-            Review and apply changes
-          </button>
-          {!isPricingSetUp && showTooltip && (
-            <div className="absolute bottom-full left-0 mb-2 px-4 py-3 text-sm text-gray-800 bg-white rounded-md shadow-lg max-w-[300px] w-max z-50">
-              <p>
-                You must{" "}
-                <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">
-                  set up pricing
-                </span>{" "}
-                before enabling Instant Payouts.
-              </p>
+    <div
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl max-w-[640px] w-full mx-6 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="px-10 pt-8">
+          <h2 className="text-[24px] font-bold text-gray-900">
+            No-code Instant Payouts
+          </h2>
+          <p className="text-[16px] text-gray-600 mt-2">
+            Customize instant payout eligibility with these dashboard controls.
+          </p>
+        </div>
+
+        {/* Content */}
+        <div className="px-10 py-8">
+          <div className="space-y-6">
+            <p className="text-[16px] text-gray-700 leading-[24px] tracking-[-0.31px]">
+              When enabled, you'll be able to:
+            </p>
+
+            <div className="space-y-5">
+              <div className="flex items-start gap-4">
+                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                  <CheckIcon className="w-3 h-3 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="text-[16px] font-semibold text-gray-900 leading-[24px] tracking-[-0.31px]">
+                    Set eligibility criteria
+                  </h4>
+                  <p className="text-[14px] text-gray-600 leading-[20px] tracking-[-0.15px] mt-1">
+                    Define which accounts are eligible based on account age,
+                    payout volume, and activity history
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                  <CheckIcon className="w-3 h-3 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="text-[16px] font-semibold text-gray-900 leading-[24px] tracking-[-0.31px]">
+                    Configure daily limits
+                  </h4>
+                  <p className="text-[14px] text-gray-600 leading-[20px] tracking-[-0.15px] mt-1">
+                    Set per-account and platform-wide daily limits to manage
+                    risk and volume
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5 flex-shrink-0">
+                  <CheckIcon className="w-3 h-3 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="text-[16px] font-semibold text-gray-900 leading-[24px] tracking-[-0.31px]">
+                    Manage pricing
+                  </h4>
+                  <p className="text-[14px] text-gray-600 leading-[20px] tracking-[-0.15px] mt-1">
+                    Control fees charged to connected accounts for instant
+                    payout transactions
+                  </p>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-10 py-6 flex justify-end space-x-3">
+          <Button variant="secondary" onClick={onClose} size="lg">
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={onConfirm} size="lg">
+            Continue
+          </Button>
         </div>
       </div>
     </div>
   );
 };
+
+const OnboardingStep1 = () => {
+  const [showEnableModal, setShowEnableModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [pricingConfigured, setPricingConfigured] = useState(false);
+  const [existingApiIntegration, setExistingApiIntegration] = useState(false);
+
+  const handleEnableClick = () => {
+    setShowEnableModal(true);
+  };
+
+  const handleConfirmEnable = () => {
+    setShowEnableModal(false);
+    setShowSettings(true);
+  };
+
+  // If settings should be shown, render the SettingsPage
+  if (showSettings) {
+    return (
+      <SettingsPage
+        pricingConfigured={pricingConfigured}
+        setPricingConfigured={setPricingConfigured}
+        existingApiIntegration={existingApiIntegration}
+        setExistingApiIntegration={setExistingApiIntegration}
+      />
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-white flex flex-row">
+      <Sidebar />
+
+      <div className="w-full h-screen flex flex-col min-w-0 relative pb-20 pt-16 overflow-scroll">
+        <div className="max-w-[1280px] w-full flex flex-col relative mx-auto">
+          <Header />
+
+          <div className="flex-1 p-6">
+            {/* Content Header */}
+            <div className="mb-6 space-y-2">
+              {/* Breadcrumbs */}
+              <div className="flex items-center space-x-2 text-xs">
+                <span className="text-indigo-600 font-semibold">Settings</span>
+                <ChevronRightIcon />
+                <span className="text-indigo-600 font-semibold">Connect</span>
+                <ChevronRightIcon />
+              </div>
+
+              <h1 className="text-2xl font-bold text-gray-900">Payouts</h1>
+              <p className="text-gray-600">
+                Customize the payout experience for your connected accounts.
+              </p>
+            </div>
+
+            {/* Tabs */}
+            <div className="border-b border-gray-200 mb-6">
+              <div className="flex space-x-6">
+                <button className="py-3 px-2 border-b-2 border-transparent text-sm font-semibold text-gray-500">
+                  External accounts
+                </button>
+                <button className="py-3 px-2 border-b-2 border-transparent text-sm font-semibold text-gray-500">
+                  Statement descriptor
+                </button>
+                <button className="py-3 px-2 border-b-2 border-indigo-600 text-sm font-semibold text-indigo-600">
+                  Instant payouts
+                </button>
+                <button className="py-3 px-2 border-b-2 border-transparent text-sm font-semibold text-gray-500">
+                  Multi-currency settlement
+                </button>
+              </div>
+            </div>
+
+            {/* Hero Section - First Step of Onboarding */}
+            <OnboardingHeader
+              title="No-code Instant Payouts"
+              description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis fringilla commodo libero vel sagittis. Pellentesque eros justo, vulputate in nulla ac, mattis volutpat nisl."
+              onEnableClick={handleEnableClick}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Enable Modal */}
+      <EnableModal
+        isOpen={showEnableModal}
+        onClose={() => setShowEnableModal(false)}
+        onConfirm={handleConfirmEnable}
+      />
+    </div>
+  );
+};
+
+// Settings Page Component (preserved Prototype2 functionality)
+// ... existing code ...
 
 const Toggle = ({ enabled, onChange, label, description }) => (
   <button
@@ -416,12 +593,14 @@ const AccountsModal = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-xl font-semibold"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {/* Criteria Section */}
@@ -545,12 +724,14 @@ const EligibilityInfoModal = ({ isOpen, onClose }) => {
           <h2 className="text-lg font-semibold text-gray-900">
             How does Stripe determine eligibility?
           </h2>
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 text-xl font-semibold"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {/* Content */}
@@ -593,12 +774,9 @@ const EligibilityInfoModal = ({ isOpen, onClose }) => {
         {/* Footer */}
         <div className="px-6 pb-4">
           <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer"
-            >
+            <Button variant="secondary" size="sm" onClick={onClose}>
               Close
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -606,25 +784,86 @@ const EligibilityInfoModal = ({ isOpen, onClose }) => {
   );
 };
 
-function Prototype2() {
+// API Integration Modal Component
+const ApiIntegrationModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl max-w-[640px] w-full p-6 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="mb-4">
+          <h2 className="font-bold text-gray-900">
+            Your API integration may need updates
+          </h2>
+        </div>
+
+        {/* Content */}
+        <div className="">
+          <div className="space-y-6">
+            <p className="text-sm">
+              We’ve noticed that you’ve made Instant Payout API calls in the
+              past. Enabling no-code dashboard controls may impact your existing
+              API integration.
+            </p>
+            <p className="text-sm">
+              Learn more and read our{" "}
+              <a
+                href=""
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-600"
+              >
+                migration guide
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end space-x-2">
+          <Button variant="secondary" onClick={onClose}>
+            Back
+          </Button>
+          <Button variant="primary" onClick={onConfirm}>
+            Continue
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Settings Page Component - Preserved Prototype2 functionality
+const SettingsPage = ({
+  pricingConfigured,
+  setPricingConfigured,
+  existingApiIntegration,
+  setExistingApiIntegration,
+}) => {
   const [noCodeControls, setNoCodeControls] = useState(true);
   const [audienceType, setAudienceType] = useState("criteria"); // 'criteria' or 'selected'
-  const [accountAge, setAccountAge] = useState(true);
+  const [accountAge, setAccountAge] = useState(false);
   const [payoutVolume, setPayoutVolume] = useState(false);
   const [payoutNumber, setPayoutNumber] = useState(false);
   const [dailyLimit, setDailyLimit] = useState("500.00");
 
   // Control panel state
-  const [multicurrency, setMulticurrency] = useState(true);
-  const [isPricingSetUp, setIsPricingSetUp] = useState(false);
-  const [pricingOwner, setPricingOwner] = useState("platform"); // "platform" or "stripe"
+  const [multicurrency, setMulticurrency] = useState(false);
   const [controlPanelExpanded, setControlPanelExpanded] = useState(false);
 
   // Country filtering state
   const [selectedCountries, setSelectedCountries] = useState({
     us: true,
     uk: false,
-    ca: false,
+    ca: true,
     es: false,
     fr: false,
   });
@@ -642,6 +881,7 @@ function Prototype2() {
   const [showAccountsModal, setShowAccountsModal] = useState(false);
   const [showEligibilityInfoModal, setShowEligibilityInfoModal] =
     useState(false);
+  const [showApiIntegrationModal, setShowApiIntegrationModal] = useState(false);
 
   // Helper function to parse number values from strings (handles commas)
   const parseNumber = (value) => {
@@ -784,6 +1024,33 @@ function Prototype2() {
     return criteria;
   };
 
+  const Footer = () => (
+    <div className="fixed bottom-0 right-0 bg-white border-t border-gray-200 py-3 z-10 w-[calc(100%-228px)]">
+      <div className="max-w-[1280px] mx-auto px-6">
+        <Tooltip
+          text={
+            !pricingConfigured
+              ? "You must set up pricing before enabling Instant Payouts."
+              : ""
+          }
+          disabled={pricingConfigured}
+        >
+          <Button
+            variant="primary"
+            onClick={() => {
+              if (existingApiIntegration) {
+                setShowApiIntegrationModal(true);
+              }
+            }}
+            disabled={!pricingConfigured}
+          >
+            Review and apply changes
+          </Button>
+        </Tooltip>
+      </div>
+    </div>
+  );
+
   // Update eligible accounts count when criteria change
   useEffect(() => {
     const count = filterEligibleAccounts();
@@ -807,7 +1074,7 @@ function Prototype2() {
       <div className="w-full h-screen flex flex-col min-w-0 relative pb-20 pt-16 overflow-scroll ">
         <div className="max-w-[1280px] w-full flex flex-col relative mx-auto">
           <Header />
-          <Footer isPricingSetUp={isPricingSetUp} />
+          <Footer />
 
           <div className="flex-1 p-6">
             {/* Content Header */}
@@ -891,13 +1158,13 @@ function Prototype2() {
                       </p>
                     </div>
                     <div className="max-w-[650px] space-y-4">
-                      {/* <RadioOption
+                      <RadioOption
                         value="recommended"
                         selectedValue={audienceType}
                         onChange={setAudienceType}
                         label="Stripe recommended"
                         description="Stripe determines which accounts are eligible."
-                      /> */}
+                      />
                       {/* Stripe recommended disclosure - only show when Stripe recommended is selected */}
                       {audienceType === "recommended" && (
                         <div className="ml-6.5 text-sm text-gray-700 p-4 bg-gray-50 rounded-md flex flex-col gap-2">
@@ -907,12 +1174,13 @@ function Prototype2() {
                             override eligibility for any account from their
                             account details page.
                           </p>
-                          <button
+                          <Button
+                            variant="link"
                             onClick={() => setShowEligibilityInfoModal(true)}
                             className="text-indigo-700 cursor-pointer hover:text-indigo-800 text-left"
                           >
                             How does Stripe determine eligibility?
-                          </button>
+                          </Button>
                         </div>
                       )}
 
@@ -936,71 +1204,16 @@ function Prototype2() {
                             onInputChange={handleAccountAgeChange}
                             suffix="days or older"
                           />
-                          <div className="space-y-3">
-                            <button
-                              onClick={() => setPayoutVolume(!payoutVolume)}
-                              className="flex items-start space-x-2 text-left w-full cursor-pointer"
-                            >
-                              <div className="flex-shrink-0 mt-0.5">
-                                <div
-                                  className={`w-3.5 h-3.5 rounded border ${
-                                    payoutVolume
-                                      ? "bg-indigo-600 border-indigo-600"
-                                      : "border-gray-300 bg-white"
-                                  } flex items-center justify-center`}
-                                >
-                                  {payoutVolume && (
-                                    <svg
-                                      className="w-2 h-2 text-white"
-                                      fill="none"
-                                      viewBox="0 0 8 8"
-                                    >
-                                      <path
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="1.5"
-                                        d="M1.5 4L3 5.5L6.5 2"
-                                      />
-                                    </svg>
-                                  )}
-                                </div>
-                              </div>
-                              <span className="font-medium text-sm text-gray-800">
-                                Total payout volume
-                              </span>
-                            </button>
-
-                            {payoutVolume && (
-                              <div className="ml-5 flex items-center space-x-2">
-                                <div className="relative">
-                                  <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
-                                    $
-                                  </span>
-                                  <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    value={payoutVolumeThreshold}
-                                    onChange={(e) =>
-                                      handlePayoutVolumeChange(e.target.value)
-                                    }
-                                    placeholder="10,000.00"
-                                    className="w-32 pl-6 pr-2 py-1 border border-gray-300 rounded-md text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-right"
-                                  />
-                                </div>
-                                <span className="text-sm text-gray-500">
-                                  {multicurrency ? "USD" : ""} or greater
-                                </span>
-                                {multicurrency && (
-                                  <Tooltip text="This amount will be converted to the local currency of the connected account.">
-                                    <div className="p-2 -ml-3">
-                                      <InfoIcon12 />
-                                    </div>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            )}
-                          </div>
+                          <Checkbox
+                            checked={payoutVolume}
+                            onChange={() => setPayoutVolume(!payoutVolume)}
+                            label="Total payout volume"
+                            showInput={true}
+                            inputValue={payoutVolumeThreshold}
+                            onInputChange={handlePayoutVolumeChange}
+                            prefix="$"
+                            suffix="or greater"
+                          />
                           <Checkbox
                             checked={payoutNumber}
                             onChange={() => setPayoutNumber(!payoutNumber)}
@@ -1143,6 +1356,43 @@ function Prototype2() {
                     </div>
                   </div>
 
+                  {/* Divider */}
+                  <hr className="border-gray-200" />
+
+                  {/* Pricing */}
+                  <div className="flex space-x-15">
+                    <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
+                      <h3 className="font-semibold text-sm text-gray-800">
+                        Pricing
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Control how much your users will be charged for Instant
+                        Payouts.
+                      </p>
+                    </div>
+                    <div className="flex-1 space-y-3">
+                      {!pricingConfigured && (
+                        <div className="flex items-center space-x-2">
+                          <AlertIcon12 />
+                          <p className="text-sm text-orange-800">
+                            You must set up pricing before enabling Instant
+                            Payouts.
+                          </p>
+                        </div>
+                      )}
+                      <p className="text-sm text-gray-700">
+                        Customize a monetization strategy for Instant Payouts in{" "}
+                        <span className="text-indigo-600 cursor-pointer hover:text-indigo-800">
+                          Platform pricing
+                        </span>
+                        .
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <hr className="border-gray-200" />
+
                   {/* Daily Limit */}
                   <div className="flex space-x-15">
                     <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
@@ -1183,96 +1433,36 @@ function Prototype2() {
                       )}
                     </div>
                   </div>
-                </>
-              )}
 
-              {/* Divider */}
-              <hr className="border-gray-200" />
-
-              {/* Pricing */}
-              <div className="flex space-x-15">
-                <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
-                  <h3 className="font-semibold text-sm text-gray-800">
-                    Pricing
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    Control how much your users will be charged for Instant
-                    Payouts.
-                  </p>
-                </div>
-                <div className="flex-1 space-y-3">
-                  {/* Info banner - only show when pricing owner is Platform */}
-                  {pricingOwner === "platform" && (
-                    <div className="bg-gray-50 rounded-lg p-3 flex items-center space-x-3">
-                      <InfoIcon />
-                      <p className="text-sm text-gray-700">
-                        This setting applies to{" "}
-                        <span className="text-indigo-600">X</span> connected
-                        accounts that you own pricing for.
+                  {/* Platform Daily Limit */}
+                  <div className="flex space-x-15">
+                    <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
+                      <h3 className="font-semibold text-sm text-gray-800">
+                        Platform daily limit
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        The total amount of Instant Payouts across all connected
+                        accounts.
                       </p>
                     </div>
-                  )}
-
-                  {!isPricingSetUp ? (
-                    <>
-                      {/* Not set up - Show "Set up pricing scheme" button */}
-                      <button className="px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 transition-all cursor-pointer">
-                        Set up pricing scheme
-                      </button>
-                      {/* Warning message */}
-                      {noCodeControls && (
-                        <div className="flex items-center space-x-2 text-[#B13600]">
-                          <AlertIcon12 />
-                          <span className="text-sm">
-                            You must set up pricing before enabling Instant
-                            Payouts.
-                          </span>
+                    <div className="flex-1 space-y-5">
+                      <div className="max-w-[550px] space-y-2">
+                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden"></div>
+                        <div className="flex justify-between text-sm text-gray-700">
+                          <span>$0.00 today</span>
+                          <span>$10,000.00 limit</span>
                         </div>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {/* Set up - Show "Edit pricing scheme" button */}
-                      <button className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer">
-                        Edit pricing scheme
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Platform Daily Limit */}
-              <div className="flex space-x-15">
-                <div className="basis-1/3 shrink-0 max-w-[300px] space-y-1">
-                  <h3 className="font-semibold text-sm text-gray-800">
-                    Platform daily limit
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    The total amount of Instant Payouts across all connected
-                    accounts.
-                  </p>
-                </div>
-                <div className="flex-1 space-y-5">
-                  <div className="max-w-[550px] space-y-2">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-indigo-600 rounded-full"
-                        style={{ width: "42%" }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-sm text-gray-700">
-                      <span>$4242.42 today</span>
-                      <span>$10,000.00 limit</span>
+                      </div>
+                      <Button variant="secondary" size="default">
+                        Request daily limit increase
+                      </Button>
+                      <p className="text-sm text-gray-500">
+                        Daily limits are reset at midnight UTC.
+                      </p>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 bg-white shadow-xs border-1 border-gray-300 text-sm font-medium rounded-md hover:border-gray-400 transition-all cursor-pointer">
-                    Request daily limit increase
-                  </button>
-                  <p className="text-sm text-gray-500">
-                    Daily limits are reset at midnight UTC.
-                  </p>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -1292,6 +1482,16 @@ function Prototype2() {
       <EligibilityInfoModal
         isOpen={showEligibilityInfoModal}
         onClose={() => setShowEligibilityInfoModal(false)}
+      />
+
+      {/* API Integration Modal */}
+      <ApiIntegrationModal
+        isOpen={showApiIntegrationModal}
+        onClose={() => setShowApiIntegrationModal(false)}
+        onConfirm={() => {
+          setShowApiIntegrationModal(false);
+          // TODO: Implement actual API integration logic
+        }}
       />
 
       {/* Floating Control Panel */}
@@ -1331,35 +1531,40 @@ function Prototype2() {
                 label="Multicurrency"
               />
 
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-gray-700">Is pricing set up</span>
-                <select
-                  value={isPricingSetUp ? "yes" : "no"}
-                  onChange={(e) => setIsPricingSetUp(e.target.value === "yes")}
-                  className="text-sm border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="no">No</option>
-                  <option value="yes">Yes</option>
-                </select>
-              </div>
+              <ControlPanelToggle
+                checked={pricingConfigured}
+                onChange={setPricingConfigured}
+                label="Pricing configured"
+              />
 
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-gray-700">Pricing owner</span>
-                <select
-                  value={pricingOwner}
-                  onChange={(e) => setPricingOwner(e.target.value)}
-                  className="text-sm border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                >
-                  <option value="platform">Platform</option>
-                  <option value="stripe">Stripe</option>
-                </select>
-              </div>
+              <ControlPanelToggle
+                checked={existingApiIntegration}
+                onChange={setExistingApiIntegration}
+                label="Existing API integration"
+              />
             </div>
           </div>
         </div>
       </div>
+
+      {/* API Integration Modal */}
+      <ApiIntegrationModal
+        isOpen={showApiIntegrationModal}
+        onClose={() => setShowApiIntegrationModal(false)}
+        onConfirm={() => {
+          setShowApiIntegrationModal(false);
+          // TODO: Implement actual API integration logic
+        }}
+      />
     </div>
   );
+};
+
+// Main Prototype3 Component - Onboarding Flow
+function Prototype3() {
+  return <OnboardingStep1 />;
 }
 
-export default Prototype2;
+// Export the settings page separately for potential future use
+export { SettingsPage };
+export default Prototype3;
